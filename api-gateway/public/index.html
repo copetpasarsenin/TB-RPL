@@ -3,79 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Gateway Dashboard - Kelompok 3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/ui/style.css">
+    <title>NexGate - Enterprise API Gateway UMKM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/ui/landing.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="logo">
-                <h2>Kelompok 3</h2>
-                <p>Integrator / API Gateway</p>
-            </div>
-            <nav>
-                <ul>
-                    <li id="menuDashboard" class="active">📊 Live Dashboard</li>
-                    <li id="menuPengaturan">⚙️ Pengaturan Gateway</li>
-                    <li id="menuPanduan">📋 Panduan Dosen</li>
-                </ul>
-            </nav>
-            
-            <div class="info-box">
-                <small>Sesuai dengan <b>Aturan #42</b>, dashboard ini hanya untuk memonitor logging dan lalulintas jaringan secara *read-only*.</small>
-            </div>
-        </aside>
+    <nav class="navbar">
+        <div class="logo">NexGate<span>.</span></div>
+        <div class="nav-links">
+            <a href="#fitur">Keunggulan</a>
+            <a href="#harga">Skema Tarif</a>
+            <a href="/docs" target="_blank">Dokumentasi API</a>
+            <a href="/ui/dashboard.html" class="btn-login">Masuk Dashboard</a>
+        </div>
+    </nav>
 
-        <main class="main-content">
-            <header>
-                <h1>System Status Dashboard</h1>
-                <div class="auth-section">
-                    <button id="generateTokenBtn" class="btn-primary">Generate Akses Token</button>
-                    <span id="tokenStatus" class="status-badge offline">Belum Terhubung</span>
-                </div>
-            </header>
-
-            <div class="metrics-grid">
-                <div class="metric-card glass">
-                    <h3>Gateway Health</h3>
-                    <div class="value" id="healthStatus">Checking...</div>
-                </div>
-                <div class="metric-card glass">
-                    <h3>Total Log Request (Hari Ini)</h3>
-                    <div class="value" id="totalRequests">0</div>
-                </div>
+    <header class="hero">
+        <div class="hero-content">
+            <div class="badge">🚀 Ekosistem UMKM Resmi Tugas Besar RPL 2</div>
+            <h1>Infrastruktur Tulang Punggung<br>Ekosistem <span class="gradient-text">UMKM Modern</span></h1>
+            <p>Satu gerbang untuk semua. Kami mengamankan, menghubungkan, dan mencatat setiap transaksi antara SmartBank, Marketplace, POS, dan Logistikita tanpa hambatan.</p>
+            <div class="cta-group">
+                <a href="/ui/dashboard.html" class="btn-primary">Mulai Integrasi Sekarang</a>
+                <a href="/docs" target="_blank" class="btn-secondary">Baca Dokumentasi</a>
             </div>
+        </div>
+    </header>
 
-            <section class="logs-section glass">
-                <div class="section-header">
-                    <h2>Live Request Logs (Histori)</h2>
-                    <div style="display:flex; gap:10px;">
-                        <button id="simulateBtn" class="btn-primary" style="background:#8b5cf6;">🚀 Simulasi Traffic</button>
-                        <button id="refreshLogsBtn" class="btn-secondary">🔄 Refresh Data</button>
-                    </div>
-                </div>
-                <div class="table-container">
-                    <table id="logsTable">
-                        <thead>
-                            <tr>
-                                <th>Waktu</th>
-                                <th>Method</th>
-                                <th>Endpoint Target</th>
-                                <th>Status HTTP</th>
-                                <th>Alamat IP</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="5" class="empty-state">Silakan klik "Generate Akses Token" di atas untuk melihat data dari Database</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-    </div>
-    <script src="/ui/script.js"></script>
+    <section id="fitur" class="features">
+        <h2 class="section-title">Mengapa Layanan Anda Membutuhkan NexGate?</h2>
+        <div class="grid">
+            <div class="card">
+                <div class="icon">🔐</div>
+                <h3>Keamanan Terpusat (JWT)</h3>
+                <p>Tidak perlu repot membuat sistem login sendiri. Kami yang memastikan setiap request yang masuk ke aplikasi Anda benar-benar valid dan bukan serangan hacker.</p>
+            </div>
+            <div class="card">
+                <div class="icon">⚡</div>
+                <h3>Routing Super Cepat</h3>
+                <p>Forwarding API berkecepatan tinggi ke berbagai layanan (Marketplace, POS, SupplierHub) dengan latensi mendekati nol millisecond.</p>
+            </div>
+            <div class="card">
+                <div class="icon">📊</div>
+                <h3>Live Analytics & Logging</h3>
+                <p>Setiap transaksi dicatat secara real-time. Memudahkan audit transaksi dan pelaporan data bisnis Anda ke UMKM Insight secara otomatis.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="harga" class="pricing">
+        <div class="pricing-card glass">
+            <h2>Investasi Infrastruktur</h2>
+            <p class="subtitle">Transparan. Sesuai Aturan Keuangan No. 10</p>
+            <div class="price">0.5%<span> / transaksi sukses</span></div>
+            <ul class="benefits">
+                <li>✔️ Unlimited API Calls (Routing Tanpa Batas)</li>
+                <li>✔️ Auto-Forward ke 6 Service Ekosistem</li>
+                <li>✔️ Akses Dashboard Monitoring 24/7</li>
+                <li>✔️ Support Integrasi Antar Kelompok RPL</li>
+            </ul>
+            <br>
+            <a href="/ui/dashboard.html" class="btn-primary" style="width:100%; text-align:center; display:block;">Daftarkan Layanan Anda</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Kelompok 3 - API Gateway Integrator. Mata Kuliah RPL 2.</p>
+    </footer>
 </body>
 </html>
