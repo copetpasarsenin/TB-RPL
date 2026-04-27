@@ -50,7 +50,6 @@ class FeeTransaction(Base):
     destination_service = Column(String)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-# Otomatis membuat tabel baru jika belum ada
 Base.metadata.create_all(bind=engine)
 
 def get_db():
@@ -58,6 +57,32 @@ def get_db():
     try:
         yield db
     finally:
+        db.close()
+
+# --- GLOBAL LOGGING MIDDLEWARE (Aturan #42) ---
+# Mencatat SEMUA aktivitas secara otomatis ke Database
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    db = SessionLocal()
+    status_code = 500
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        return response
+    except Exception as e:
+        raise e
+    finally:
+        # Hindari nge-log halaman UI dan Dokumntasi biar ga penuh
+        ignored_paths = ["/ui", "/docs", "/openapi.json"]
+        if not any(request.url.path.startswith(p) for p in ignored_paths):
+            log = RequestLog(
+                method=request.method,
+                path=request.url.path,
+                source_ip=request.client.host if request.client else "127.0.0.1",
+                status_code=status_code
+            )
+            db.add(log)
+            db.commit()
         db.close()
 
 # --- SECURITY ---
@@ -123,7 +148,6 @@ def biaya_layanan(payload: dict, db: Session = Depends(get_db), user=Depends(ver
         }
     }
 
-# Service registry mapping (port dari kelompok lain)
 SERVICE_REGISTRY = {
     "smartbank": "http://localhost:8081",
     "marketplace": "http://localhost:8082",
@@ -135,30 +159,18 @@ SERVICE_REGISTRY = {
 
 @app.api_route("/integrator/routing_api/{service_name}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"], summary="Routing API (Forward Request)")
 async def proxy_to_service(request: Request, service_name: str, path: str, db: Session = Depends(get_db)):
-    # Validasi Token JWT
     auth_header = request.headers.get("authorization")
     if request.method != "OPTIONS":
         if not auth_header or not auth_header.startswith("Bearer "):
-            log = RequestLog(method=request.method, path=request.url.path, source_ip=request.client.host, status_code=401)
-            db.add(log)
-            db.commit()
             return JSONResponse(status_code=401, content={"status": "error", "message": "Authorization header diperlukan"})
-        
         token = auth_header.split(" ")[1]
         try:
             jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         except Exception:
-            log = RequestLog(method=request.method, path=request.url.path, source_ip=request.client.host, status_code=401)
-            db.add(log)
-            db.commit()
             return JSONResponse(status_code=401, content={"status": "error", "message": "Token tidak valid"})
 
-    # Forwarding
     target_base = SERVICE_REGISTRY.get(service_name)
     if not target_base:
-        log = RequestLog(method=request.method, path=request.url.path, source_ip=request.client.host, status_code=404)
-        db.add(log)
-        db.commit()
         return JSONResponse(status_code=404, content={"status": "error", "message": "Service tidak ditemukan dalam Registry Gateway"})
 
     target_url = f"{target_base}/{path}"
@@ -187,12 +199,6 @@ async def proxy_to_service(request: Request, service_name: str, path: str, db: S
         response_content = b'{"status": "error", "message": "Gagal menghubungi service tujuan"}'
         response_headers = {"content-type": "application/json"}
 
-    # Pencatatan (Logging)
-    log = RequestLog(method=request.method, path=request.url.path, source_ip=request.client.host, status_code=status_code)
-    db.add(log)
-    db.commit()
-
     return Response(content=response_content, status_code=status_code, headers=response_headers)
 
-# Static Files untuk Dashboard UI yang sudah kita buat sebelumnya
-app.mount("/ui", StaticFiles(directory="public"), name="ui")
+app.mount("/ui", StaticFiles(directory="public", html=True), name="ui")

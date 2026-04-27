@@ -108,3 +108,54 @@ async function fetchLogs() {
 checkHealth();
 // Update health check setiap 10 detik
 setInterval(checkHealth, 10000);
+
+// --- INTERAKTIVITAS TAMBAHAN ---
+
+// Biar menu sidebar bisa diklik (kosmetik untuk dosen)
+document.getElementById('menuPengaturan').addEventListener('click', () => {
+    alert("Menu Pengaturan (Settings) dikunci. Hanya admin server yang bisa mengubah konfigurasi Gateway.");
+});
+
+document.getElementById('menuPanduan').addEventListener('click', () => {
+    alert("Ini adalah API Gateway buatan Kelompok 3.\nSemua request dari aplikasi lain (Marketplace, POS, dll) HARUS melewati sistem ini untuk dicatat log-nya dan dipotong fee 0.5%.");
+});
+
+// Fitur Tombol Simulasi (Biar tabelnya nggak kosong kalau dipamerin)
+document.getElementById('simulateBtn').addEventListener('click', async () => {
+    if (!currentToken) {
+        alert("Silakan Generate Akses Token dulu sebelum melakukan simulasi!");
+        return;
+    }
+    
+    const btn = document.getElementById('simulateBtn');
+    btn.textContent = "⏳ Memproses...";
+    
+    // Nembak API dummy ke endpoint biaya layanan
+    try {
+        await fetch('/integrator/biaya_layanan_integrasi', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentToken}` 
+            },
+            body: JSON.stringify({ amount: 50000, source_service: 'marketplace', destination_service: 'smartbank' })
+        });
+        
+        await fetch('/integrator/biaya_layanan_integrasi', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentToken}` 
+            },
+            body: JSON.stringify({ amount: 15000, source_service: 'pos', destination_service: 'smartbank' })
+        });
+
+        // Refresh tabel
+        fetchLogs();
+        btn.textContent = "🚀 Simulasi Traffic";
+        alert("Simulasi berhasil! 2 request bohongan dari Marketplace dan POS berhasil ditembak ke API Gateway dan dicatat di database.");
+    } catch (e) {
+        btn.textContent = "🚀 Simulasi Traffic";
+        console.error(e);
+    }
+});

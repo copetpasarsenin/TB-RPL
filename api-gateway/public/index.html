@@ -16,9 +16,9 @@
             </div>
             <nav>
                 <ul>
-                    <li class="active">📊 Live Dashboard</li>
-                    <li>⚙️ Pengaturan Gateway</li>
-                    <li>📋 Panduan Dosen</li>
+                    <li id="menuDashboard" class="active">📊 Live Dashboard</li>
+                    <li id="menuPengaturan">⚙️ Pengaturan Gateway</li>
+                    <li id="menuPanduan">📋 Panduan Dosen</li>
                 </ul>
             </nav>
             
@@ -50,7 +50,10 @@
             <section class="logs-section glass">
                 <div class="section-header">
                     <h2>Live Request Logs (Histori)</h2>
-                    <button id="refreshLogsBtn" class="btn-secondary">🔄 Refresh Data</button>
+                    <div style="display:flex; gap:10px;">
+                        <button id="simulateBtn" class="btn-primary" style="background:#8b5cf6;">🚀 Simulasi Traffic</button>
+                        <button id="refreshLogsBtn" class="btn-secondary">🔄 Refresh Data</button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table id="logsTable">
