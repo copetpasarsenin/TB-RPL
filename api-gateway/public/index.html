@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Gateway Dashboard - Kelompok 3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/ui/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Kelompok 3</h2>
+                <p>Integrator / API Gateway</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active">📊 Live Dashboard</li>
+                    <li>⚙️ Pengaturan Gateway</li>
+                    <li>📋 Panduan Dosen</li>
+                </ul>
+            </nav>
+            
+            <div class="info-box">
+                <small>Sesuai dengan <b>Aturan #42</b>, dashboard ini hanya untuk memonitor logging dan lalulintas jaringan secara *read-only*.</small>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>System Status Dashboard</h1>
+                <div class="auth-section">
+                    <button id="generateTokenBtn" class="btn-primary">Generate Akses Token</button>
+                    <span id="tokenStatus" class="status-badge offline">Belum Terhubung</span>
+                </div>
+            </header>
+
+            <div class="metrics-grid">
+                <div class="metric-card glass">
+                    <h3>Gateway Health</h3>
+                    <div class="value" id="healthStatus">Checking...</div>
+                </div>
+                <div class="metric-card glass">
+                    <h3>Total Log Request (Hari Ini)</h3>
+                    <div class="value" id="totalRequests">0</div>
+                </div>
+            </div>
+
+            <section class="logs-section glass">
+                <div class="section-header">
+                    <h2>Live Request Logs (Histori)</h2>
+                    <button id="refreshLogsBtn" class="btn-secondary">🔄 Refresh Data</button>
+                </div>
+                <div class="table-container">
+                    <table id="logsTable">
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Method</th>
+                                <th>Endpoint Target</th>
+                                <th>Status HTTP</th>
+                                <th>Alamat IP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="empty-state">Silakan klik "Generate Akses Token" di atas untuk melihat data dari Database</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/ui/script.js"></script>
+</body>
+</html>

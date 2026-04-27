@@ -1,0 +1,230 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Gateway - Tugas Besar RPL 2 (Kelompok 3)",
+    "description": "Dokumentasi API untuk sistem API Gateway ekosistem UMKM.\nGateway ini bertindak sebagai proxy dan middleware untuk 6 service lainnya (SmartBank, Marketplace, POS, LogistiKita, SupplierHub, UMKM Insight).\n\nSemua request yang mengarah ke `/api/{service}/*` harus menyertakan **Bearer Token JWT** dan akan dipotong fee 0.5% secara otomatis jika ada parameter finansial.\n",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local Gateway Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check Gateway",
+        "description": "Mengecek apakah server API Gateway hidup.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "success",
+                  "message": "API Gateway is running",
+                  "service": "api-gateway"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/token": {
+      "post": {
+        "summary": "Generate JWT Token (Dummy)",
+        "description": "Membuat JWT token untuk simulasi otentikasi. Token ini wajib digunakan di semua endpoint lain.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "kelompok3"
+                  },
+                  "role": {
+                    "type": "string",
+                    "example": "admin"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token Generated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "success",
+                  "message": "Token generated successfully",
+                  "data": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR..."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/fee/calculate": {
+      "post": {
+        "summary": "Hitung & Potong Fee 0.5%",
+        "description": "Mengeksekusi pemotongan fee sebesar 0.5% dari sebuah transaksi antar aplikasi.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "example": 100000
+                  },
+                  "source_service": {
+                    "type": "string",
+                    "example": "marketplace"
+                  },
+                  "destination_service": {
+                    "type": "string",
+                    "example": "smartbank"
+                  },
+                  "user_id": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fee Calculated Successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "success",
+                  "message": "Fee calculated successfully",
+                  "data": {
+                    "transaction_id": "e914a93b-...",
+                    "original_amount": 100000,
+                    "fee_percent": 0.5,
+                    "fee_amount": 500,
+                    "total_amount": 100500
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/gateway/dashboard": {
+      "get": {
+        "summary": "Lihat Dashboard Statistik",
+        "description": "Mengembalikan data statistik gateway, termasuk total fee yang terkumpul, jumlah request, dan status health service lain.",
+        "responses": {
+          "200": {
+            "description": "Dashboard Data"
+          }
+        }
+      }
+    },
+    "/gateway/logs": {
+      "get": {
+        "summary": "Dapatkan Log Request",
+        "description": "Melihat histori log seluruh aktivitas yang melewati gateway.",
+        "responses": {
+          "200": {
+            "description": "Log Data List"
+          }
+        }
+      }
+    },
+    "/gateway/services": {
+      "get": {
+        "summary": "Daftar Service Registry",
+        "description": "Melihat daftar service aplikasi yang terdaftar di gateway beserta URL-nya.",
+        "responses": {
+          "200": {
+            "description": "Service Registry Data List"
+          }
+        }
+      }
+    },
+    "/api/{serviceName}/{endpointPath}": {
+      "options": {
+        "summary": "Proxy Request ke Service Lain",
+        "description": "Ini adalah ENDPOINT UTAMA (Proxy).\nSetiap request HTTP (GET, POST, PUT, DELETE) yang ditembak ke sini akan diteruskan oleh Gateway ke server aplikasi aslinya.\n",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "serviceName",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "smartbank",
+                "marketplace",
+                "pos",
+                "logistikita",
+                "supplierhub",
+                "umkm-insight"
+              ]
+            },
+            "description": "Nama aplikasi tujuan"
+          },
+          {
+            "in": "path",
+            "name": "endpointPath",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Endpoint spesifik dari aplikasi tujuan (contoh \"saldo\", \"products\", dll)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Meneruskan response dari aplikasi target."
+          },
+          "401": {
+            "description": "Unauthorized (Token JWT tidak ada atau salah)."
+          },
+          "429": {
+            "description": "Too Many Requests (Kena Rate Limit atau Cooldown 10 detik)."
+          }
+        }
+      }
+    }
+  }
+}
